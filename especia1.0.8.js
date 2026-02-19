@@ -340,6 +340,41 @@ html.theme-yellow-black :where(#ac-widget,#ac-widget *,#ac-panel,#ac-panel *,#ac
         injectWidgetCSS();
         loadPreferences();
 
+        // Improvement the plugin to add drag & drop capability to the panel's button
+        // 1. When the HTML is injected at Document Object Model, the element "ac-widget" exists
+        // 2. Select that element and adding the drag & drop capability
+        const el = document.getElementById("ac-widget");
+
+        if (el) {
+          let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+          el.onmousedown = dragMouseDown;
+
+          function dragMouseDown(e) {
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+            el.style.cursor = "grabbing";
+          }
+
+          function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            el.style.top = (el.offsetTop - pos2) + "px";
+            el.style.left = (el.offsetLeft - pos1) + "px";
+          }
+
+          function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            el.style.cursor = "grab";
+          }
+        }
+
         $('#ac-banner').on('click', togglePanel);
         $('#ac-overlay').on('click', () => closePanel());
         $('#ac-close-panel').on('click', closePanel);
